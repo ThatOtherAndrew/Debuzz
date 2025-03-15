@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "hypercorn>=0.17.3",
+    "openai>=1.66.3",
+    "python-dotenv>=1.0.1",
     "quart>=0.20.0",
     "quart-cors>=0.8.0",
     "textstat>=0.7.5",
