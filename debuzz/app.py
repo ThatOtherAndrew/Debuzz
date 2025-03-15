@@ -1,8 +1,13 @@
-from quart import Quart
+import quart
 
-app = Quart(__name__)
+app = quart.Quart(__name__, static_url_path='/', static_folder='static')
 
 
-@app.route("/api")
+@app.route('/')
+async def index():
+    return await app.send_static_file('index.html')
+
+
+@app.route('/api')
 async def json():
-    return {"hello": "world"}
+    return {'hello': 'world'}
