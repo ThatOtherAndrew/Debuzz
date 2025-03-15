@@ -39,19 +39,42 @@ document.getElementById('debuzz-button').addEventListener('click', () => {
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.getElementById('soundToggle');
-    chrome.storage.sync.get(['soundEnabled'], (result) => {
-        if (result.sound === false) {
-            toggle.checked = false;
-        } else {
-            toggle.checked = true;
-        }
-    });
+document.getElementById('on-button').addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (!tabs.length) return;
 
-    toggle.addEventListener('change', () => {
-        chrome.storage.sync.set({ soundEnabled: toggle.checked });
-    });
+        const tabId = tabs[0].id;
 
-    chrome.runtime.sendMessage({action: "getBuzzScore"});
+        // inject content script before sending message
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ["content.js"]
+        }, () => {
+            if (chrome.runtime.lastError) {
+                console.error("Script injection failed :", chrome.runtime.lastError);
+                return;
+            }
+            console.log("Script injected successfully");
+            // nooooow send the message after the script is injected
+            chrome.tabs.sendMessage(tabId, { action: "turnOn" });
+        });
+    });
 });
+
+// document.addEventListener("DOMContentLoaded", function () {
+//     const toggle = document.getElementById("soundToggle");
+
+//     // Load saved state
+//     chrome.storage.sync.get(["soundEnabled"], function (result) {
+//         toggle.checked = result.soundEnabled ?? false; // Default false
+//     });
+
+//     // Handle toggle switch
+//     toggle.addEventListener("change", function () {
+//         const soundEnabled = toggle.checked;
+//         chrome.storage.sync.set({ soundEnabled });
+//         console.log("Sound enabled :", soundEnabled);
+
+//         chrome.runtime.sendMessage({ action: "toggleSound", enabled: soundEnabled });
+//     });
+// });
