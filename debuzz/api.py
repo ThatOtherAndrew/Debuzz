@@ -1,6 +1,7 @@
 import quart
 import textstat
 from quart_cors import cors
+from quart import jsonify
 
 from .buzzwords import BuzzwordChecker
 
@@ -22,7 +23,7 @@ async def debuzz(count_threshold: int | None = None, freq_threshold: int | None 
     words = body.decode().split()
     return ' '.join(
         (word if buzzwords.check(word, count_threshold,
-         freq_threshold) else '*' * len(word))
+         freq_threshold) else 'o' * len(word))
         for word in words
     )
 
