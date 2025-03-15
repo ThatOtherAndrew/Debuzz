@@ -7,5 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "hypercorn>=0.17.3",
     "quart>=0.20.0",
+    "quart-cors>=0.8.0",
     "textstat>=0.7.5",
 ]
