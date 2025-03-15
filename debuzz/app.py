@@ -1,7 +1,10 @@
 import quart
-from .api import api
+
+from dotenv import load_dotenv
+load_dotenv()
 
 app = quart.Quart(__name__, static_url_path='/', static_folder='static')
+from .api import api
 app.register_blueprint(api)
 
 
