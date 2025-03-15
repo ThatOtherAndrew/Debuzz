@@ -3,8 +3,15 @@
   "name": "Debuzz",
   "version": "1.0.0",
   "description": "the ultimate tool to debuzz any web page !",
-  "host_permissions": ["<all_urls>"],
-  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "audiocapture"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -14,9 +21,23 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/buzz_sound.mp3"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }

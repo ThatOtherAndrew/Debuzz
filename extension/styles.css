@@ -1,6 +1,6 @@
 .btn {
 	border-radius: 10px;
-	background-color: rgba(255, 233, 38, 0.87);
+	background-color: #e1a720;
 	color: black;
 	border: none;
 	padding: 10px 20px;
@@ -10,4 +10,55 @@
 .btn:hover {
 	background-color: rgba(107, 91, 13, 0.87);
 	color: rgba(255, 232, 119, 0.87);
+}
+
+body {
+	font-family: Arial, sans-serif;
+	text-align: center;
+	width: 200px;
+}
+.toggle-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 20px;
+}
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 50px;
+	height: 25px;
+}
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: 0.4s;
+	border-radius: 25px;
+}
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 18px;
+	width: 18px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	transition: 0.4s;
+	border-radius: 50%;
+}
+input:checked + .slider {
+	background-color: #e1a720;
+}
+input:checked + .slider:before {
+	transform: translateX(24px);
 }
