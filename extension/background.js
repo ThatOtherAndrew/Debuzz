@@ -37,3 +37,21 @@ document.getElementById('debuzz-button').addEventListener('click', () => {
         });
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('soundToggle');
+    chrome.storage.sync.get(['soundEnabled'], (result) => {
+        if (result.sound === false) {
+            toggle.checked = false;
+        } else {
+            toggle.checked = true;
+        }
+    });
+
+    toggle.addEventListener('change', () => {
+        chrome.storage.sync.set({ soundEnabled: toggle.checked });
+    });
+
+    chrome.runtime.sendMessage({action: "getBuzzScore"});
+});
