@@ -1,7 +1,11 @@
+from textwrap import shorten
+
 import quart
 from openai import AsyncOpenAI
 from quart_cors import cors
 from textstat.textstat import textstat
+
+from . import db
 
 api = cors(
     quart.Blueprint('api', __name__, url_prefix='/api'),
@@ -31,17 +35,54 @@ Assistant: The US space team's Up Goer Five is the only flying space car that ha
 
 @api.route('/debuzz', methods=['POST'])
 async def debuzz():
-    body = await quart.request.get_data()
+    text = (await quart.request.get_data()).decode()
+
+    # Retrieve from cache if exists
+    async with db.cache.execute(
+        'SELECT output FROM cache WHERE input = ?',
+        (text,)
+    ) as cursor:
+        row = await cursor.fetchone()
+        if row:
+            output = row['output']
+            quart.current_app.logger.debug('Cache hit: ' + shorten(text, 50))
+            # Update cache timestamp
+            await db.cache.execute(
+                "UPDATE cache SET timestamp = (strftime('%s', 'now')) WHERE input = ?",
+                (text,)
+            )
+            return output
+
+    quart.current_app.logger.debug('Debuzzing: ' + shorten(text, 50))
     response = await client.responses.create(
         model='gpt-4o-mini',
         instructions=SYSTEM_MESSAGE,
-        input=body.decode(),
+        input=text,
         metadata={
             'action': 'debuzz',
         }
     )
 
+    # Cache the result
+    await db.cache.execute(
+        'INSERT INTO cache (input, output) VALUES (?, ?)',
+        (text, response.output_text)
+    )
+    await db.cache.commit()
+
+
     return response.output_text
+
+
+@api.route('/history')
+async def get_cache_history(limit: int = 20, offset: int = 0):
+    async with db.cache.execute(
+        'SELECT * FROM cache ORDER BY timestamp DESC LIMIT ? OFFSET ?',
+        (limit, offset)
+    ) as cursor:
+        # noinspection PyTypeChecker
+        # ^ PyCharm don't be silly
+        return list(map(dict, await cursor.fetchall()))
 
 
 @api.route('/buzzvol', methods=['POST'])

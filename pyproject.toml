@@ -5,6 +5,7 @@ description = "The universal buzzword sanitiser"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "hypercorn>=0.17.3",
     "openai>=1.66.3",
     "python-dotenv>=1.0.1",
