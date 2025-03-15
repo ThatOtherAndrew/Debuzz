@@ -1,3 +1,7 @@
+# LLM query cache
+/cache.db
+*.db-journal
+
 # macOS nonsense
 .DS_Store
 
