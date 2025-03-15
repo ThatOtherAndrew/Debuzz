@@ -29,11 +29,6 @@ Assistant: The US space team's Up Goer Five is the only flying space car that ha
 """.strip()
 
 
-@api.route('/')
-async def json():
-    return {'hello': 'world'}
-
-
 @api.route('/debuzz', methods=['POST'])
 async def debuzz():
     body = await quart.request.get_data()
