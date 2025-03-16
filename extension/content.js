@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ status: "content_script_running" });
     }
     if (request.action === "history") {
-        window.open('http://localhost:7777/history', '_blank').focus();
+        window.open('https://debuzz.buzz/history', '_blank').focus();
     }
 });
 
