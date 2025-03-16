@@ -1,5 +1,5 @@
 function fetchAPI(path) {
-    const baseURL = "http://localhost:7777/api/";
+    const baseURL = "https://debuzz.buzz/api/";
     return baseURL + path;
 }
 
@@ -135,7 +135,7 @@ function debuzzSubstitute() {
             parentStyle.color = '#ffbf00';
         })
 
-        fetch('http://localhost:7777/api/debuzz', {
+        fetch(fetchAPI('debuzz'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
