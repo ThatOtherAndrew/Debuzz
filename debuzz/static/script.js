@@ -13,6 +13,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 async function debuzz() {
     console.log('Debuzzing...');
 
+    const debuzzButton = document.getElementById('btn-debuzz');
+
+    debuzzButton.ariaBusy = 'true';
+    debuzzButton.disabled = true;
+
     const textarea = document.getElementById('buzzwordInput');
     const text = textarea.value;
 
@@ -41,5 +46,8 @@ async function debuzz() {
     } catch (error) {
         console.error('Debuzzing error:', error.message);
         alert(`Error: ${error.message}`);
+    } finally {
+        debuzzButton.ariaBusy = 'false';
+        debuzzButton.disabled = false;
     }
 }
