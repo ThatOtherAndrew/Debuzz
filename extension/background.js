@@ -60,27 +60,3 @@ document.getElementById('on-button').addEventListener('click', () => {
         });
     });
 });
-
-// chrome.runtime.onInstalled.addListener(() => {
-//     chrome.storage.sync.set({ debuzzed: false }, () => {
-//         console.log("debuzzed initialized to false");
-//     });
-// });
-
-// document.addEventListener("DOMContentLoaded", function () {
-//     const toggle = document.getElementById("soundToggle");
-
-//     // Load saved state
-//     chrome.storage.sync.get(["soundEnabled"], function (result) {
-//         toggle.checked = result.soundEnabled ?? false; // Default false
-//     });
-
-//     // Handle toggle switch
-//     toggle.addEventListener("change", function () {
-//         const soundEnabled = toggle.checked;
-//         chrome.storage.sync.set({ soundEnabled });
-//         console.log("Sound enabled :", soundEnabled);
-
-//         chrome.runtime.sendMessage({ action: "toggleSound", enabled: soundEnabled });
-//     });
-// });

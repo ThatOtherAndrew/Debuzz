@@ -80,7 +80,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "turnOn") {
         console.log("i'm tryong ok");
 
-        chrome.storage.sync.set({ debuzzed: false });
+        chrome.storage.sync.set({ debuzzed: false }, () => {
+            console.log("Reset debuzzed state");
+            getBuzzVolume();  // Recalculate buzz volume based on updated page text
+        });
 
         chrome.storage.sync.get(["buzzVolume"], (result) => {
             if (result.buzzVolume) {
@@ -161,6 +164,4 @@ function stopBuzzing() {
     }
 }
 
-
-
-getBuzzVolume();
+// getBuzzVolume();
