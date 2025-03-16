@@ -11,12 +11,14 @@
     "scripting",
     "storage"
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "assets/2.png"
+    "default_icon": "assets/icon16W.png"
+  },
+  "icons": {
+    "16": "assets/icon16W.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon48.png"
   },
   "content_scripts": [
     {
