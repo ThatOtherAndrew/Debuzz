@@ -76,7 +76,7 @@ p {
 
 @keyframes glow {
     0% {
-        box-shadow: 0 0 10px 0px #ffbf00be;
+        box-shadow: 0 0 10px 0 #ffbf00be;
     }
 
     50% {
@@ -84,7 +84,7 @@ p {
     }
 
     100% {
-        box-shadow: 0 0 10px 0px #ffbf00be;
+        box-shadow: 0 0 10px 0 #ffbf00be;
     }
 }
 
@@ -128,6 +128,7 @@ p {
 #up-arrow {
     border-radius: 25rem;
     background-color: #ffd65b;
+    transition: transform .1s ease-out;
 }
 
 #down-arrow:hover {
@@ -166,18 +167,18 @@ p {
     text-align: center;
 }
 
-#ver-but-2 {
+#ver-but-1 {
     display: flex;
-    flex-direction: top;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: left;
     align-items: center;
     gap: 20px;
 }
 
-#ver-but-1 {
+#ver-but-2 {
     display: flex;
-    flex-direction: top;
-    justify-content: left;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 20px;
 }
