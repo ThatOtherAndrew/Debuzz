@@ -140,7 +140,6 @@ async def debuzz():
         )
         response_strings = json.loads(response.output_text)['simplified_strings']
         # strict=True asserts that the LLM returned the right number of responses
-        print(cache_misses.keys(), response_strings, sep='\n')
         remaining_outputs = dict(zip(cache_misses.keys(), response_strings, strict=True))
 
         for index, output in remaining_outputs.items():
