@@ -144,7 +144,10 @@ async def debuzz():
 
 
 @api.route('/history')
-async def get_cache_history(limit: int = 20, offset: int = 0):
+async def get_cache_history():
+    limit = int(quart.request.args.get('limit', 20))
+    offset = int(quart.request.args.get('offset', 0))
+
     async with db.cache.execute(
         'SELECT * FROM cache ORDER BY timestamp DESC LIMIT ? OFFSET ?',
         (limit, offset)
