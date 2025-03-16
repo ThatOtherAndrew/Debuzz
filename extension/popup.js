@@ -2,7 +2,7 @@ const buzzScoreElement = document.getElementById('buzz-score');
 
 function updateBuzzScore() {
     chrome.storage.sync.get(['buzzScore'], (result) => {
-        if (result.buzzScore != undefined) {
+        if (result.buzzScore !== undefined) {
             buzzScoreElement.textContent = result.buzzScore;
         } else {
             buzzScoreElement.textContent = "failed";
