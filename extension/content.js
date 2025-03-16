@@ -4,7 +4,7 @@ function fetchAPI(path) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "debuzzAction") {
+    if (request.action === "debuzz") {
         console.log("debuzzing from content");
 
         chrome.storage.sync.set({ debuzzed: true });
@@ -34,6 +34,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action === "ping") {
         sendResponse({ status: "content_script_running" });
+    }
+    if (request.action === "history") {
+        window.open('http://localhost:7777/history', '_blank').focus();
     }
 });
 

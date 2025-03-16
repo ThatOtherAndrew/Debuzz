@@ -15,6 +15,10 @@ body {
     margin: 20px;
 }
 
+#logo:hover {
+
+}
+
 
 button:hover {
     animation: shake 0.5s;
@@ -226,5 +230,12 @@ p {
         top: 5px;
         height: 100vh;
 
+    }
+
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
 }

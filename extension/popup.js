@@ -44,7 +44,7 @@ document.getElementById('debuzz-button').addEventListener('click', () => {
         const tabId = tabs[0].id;
 
         ensureContentScript(tabId, () => {
-            chrome.tabs.sendMessage(tabId, { action: "debuzzAction" });
+            chrome.tabs.sendMessage(tabId, { action: "debuzz" });
         });
     });
 });
@@ -57,6 +57,20 @@ document.getElementById('on-button').addEventListener('click', () => {
 
         ensureContentScript(tabId, () => {
             chrome.tabs.sendMessage(tabId, { action: "turnOn" });
+        });
+    });
+});
+
+
+
+// when hist-button clicke send a message to view the kick ass cache
+document.getElementById('hist-button').addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (!tabs.length) return;
+        const tabId = tabs[0].id;
+
+        ensureContentScript(tabId, () => {
+            chrome.tabs.sendMessage(tabId, { action: "history" });
         });
     });
 });
