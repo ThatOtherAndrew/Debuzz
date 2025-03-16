@@ -24,3 +24,8 @@ async def after_serving():
 @app.route('/')
 async def index():
     return await app.send_static_file('index.html')
+
+
+@app.route('/history')
+async def history():
+    return await app.send_static_file('history.html')

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.amber.min.css">
+  <title>Debuzz History</title>
+
+  <style>
+      tbody tr {
+          opacity: 0;
+          transform: scale(98%);
+          transition: opacity .5s ease-out, transform .5s ease-out;
+      }
+
+      .loading-indicator {
+          display: flex;
+          justify-content: center;
+          opacity: 0;
+          height: 0;
+          padding: 0;
+          overflow: hidden;
+          transform: scale(70%);
+          transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+
+      /* noinspection ALL */
+      .show {
+          opacity: 1;
+          transform: scale(1);
+      }
+
+      /* noinspection ALL */
+      .loading-indicator.show {
+          height: auto;
+          padding: var(--pico-block-spacing-vertical) var(--pico-block-spacing-horizontal);
+      }
+  </style>
+
+  <!--suppress JSUnresolvedReference -->
+  <script defer>
+      window.onload = async () => {
+          document.querySelector('.loading-indicator').classList.add('show');
+
+          let offset = 0
+          while (true) {
+              const response = await fetch(`http://localhost:7777/api/history?offset=${offset}`);
+              const json = await response.json();
+
+              if (json.length === 0) {
+                  break;
+              }
+
+              for (const element of json) {
+                  const row = document.getElementById('table-content').insertRow(-1);
+                  row.insertCell(-1).innerText = element.input;
+                  row.insertCell(-1).innerText = element.output;
+                  row.insertCell(-1).innerText = element.timestamp;
+                  requestAnimationFrame(() => {
+                      row.classList.add('show');
+                  })
+                  await new Promise(resolve => setTimeout(resolve, 5));
+              }
+
+              offset += 20;
+          }
+
+          document.querySelector('.loading-indicator').classList.remove('show');
+      }
+  </script>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Debuzz History</h1>
+    <hr>
+
+    <article class="loading-indicator">
+      <strong aria-busy="true">Loading data...</strong>
+    </article>
+
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Original text</th>
+          <th>Debuzzed text</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="table-content">
+      </tbody>
+    </table>
+  </main>
+</body>
+
+</html>
