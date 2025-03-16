@@ -129,6 +129,12 @@ function debuzzSubstitute() {
         const chunk = nodeList.slice(i, i + chunkSize);
         console.debug(`Debuzzing strings ${i}-${i + chunkSize - 1}...`)
 
+        chunk.forEach(node => {
+            const parentStyle = node.parentElement.style;
+            parentStyle.transition = `color 0.5s ${Math.random()}s ease-out`;
+            parentStyle.color = '#ffbf00';
+        })
+
         fetch('http://localhost:7777/api/debuzz', {
             method: 'POST',
             headers: {
@@ -145,8 +151,17 @@ function debuzzSubstitute() {
         }).then(json => {
             json.map((newContent, index) => {
                 chunk[index].textContent = newContent;
-            })
-            console.debug(`Successfully debuzzed strings ${i}-${i + chunkSize - 1}!`)
+
+                const parentStyle = chunk[index].parentElement.style;
+                parentStyle.backgroundColor = '#ffbf00';
+                parentStyle.removeProperty('color');
+
+                setTimeout(() => {
+                    parentStyle.transition = 'background-color 1s cubic-bezier(0.25, 1, 0.5, 1)';
+                    parentStyle.backgroundColor = 'transparent';
+                }, 100);
+            });
+            console.debug(`Successfully debuzzed strings ${i}-${i + chunkSize - 1}!`);
         }).catch(error => {
             console.error('Debuzzing error:', error.message);
         });
