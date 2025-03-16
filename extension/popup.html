@@ -1,20 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debuzz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.amber.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div calss="container">
-        <button class="btn" id="on-button">gimme that buzz, boi</button>
-        <button class="btn" id="debuzz-button">DEBUZZ</button>
-        <div id="buzz-div">Buzz Score: <span id="buzz-score"> </span></div>
-        <!-- <label class="switch">
-            <input type="checkbox" id="soundToggle">
-            <span class="slider"></span>
-        </label> -->
-        <script src="background.js"></script>
 
-    </div>
+    <main class="container">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <img src="assets/volume.png" alt="Volume Icon"  class="invert-icon">
+            <button id="on-button">gimme that buzz, boi</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <img src="assets/bee.png" alt="Volume Icon" class="invert-icon">
+            <button id="debuzz-button">Debuzz this page</button>
+        </div>
+
+        <div id="buzz-div">Buzz Score: <span id="buzz-score">0</span></div>
+    </main>
+
+    <script src="background.js"></script>
+
 </body>
 </html>
