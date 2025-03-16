@@ -4,6 +4,7 @@ import quart
 from openai import AsyncOpenAI
 from quart_cors import cors
 from textstat.textstat import textstat
+from werkzeug.exceptions import HTTPException
 
 from . import db
 
@@ -70,6 +71,17 @@ RESPONSE_SCHEMA = json.loads("""
   }
 }
 """)
+
+
+@api.errorhandler(Exception)
+async def handle_http_exception(error: Exception) -> quart.Response:
+    quart.current_app.logger.exception(error)
+    return quart.Response(
+        response=json.dumps({'error': str(error)}),
+        status=error.code if isinstance(error, HTTPException) else 500,
+        headers={'Access-Control-Allow-Origin': '*'},
+        content_type='application/json',
+    )
 
 
 @api.route('/debuzz', methods=['POST'])
