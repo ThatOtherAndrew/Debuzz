@@ -1,30 +1,6 @@
-function extractPageText() {
-    return document.body.innerText;
-}
-
 function fetchAPI(path) {
     const baseURL = "http://localhost:7777/api/";
     return baseURL + path;
-}
-
-async function debuzzText(originalText) {
-    try {
-        const response = await fetch(fetchAPI('debuzz'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: originalText })
-        });
-
-        if (!response.ok) {
-            throw new Error(`fUcIng HTTP error w status : ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.text;
-    } catch (error) {
-        console.error("eeeerrror debuzzing text :", error);
-        return originalText;
-    }
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -72,14 +48,14 @@ if (!window.audioInstance) {
 
 function getBuzzVolume() {
     chrome.storage.sync.get(["debuzzed"], (result) => {
-        if (result.debuzzed == true) {
+        if (result.debuzzed) {
             console.log("page debuzzed, no buzz :((((");
             return;
         }
         fetch(fetchAPI('buzzvol'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: extractPageText() })
+            body: JSON.stringify({ text: document.body.innerText })
         })
             .then(response => {
                 if (!response.ok) {
@@ -167,5 +143,3 @@ function debuzzSubstitute() {
     });
 
 }
-
-// getBuzzVolume();
