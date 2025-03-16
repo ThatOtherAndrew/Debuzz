@@ -123,27 +123,34 @@ function debuzzSubstitute() {
         nodeList.push(node);
     }
 
-    fetch('http://localhost:7777/api/debuzz', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(nodeList.map(node => node.textContent)),
-    }).then(response => {
-        if (!response.ok) {
-            return response.json().then(json => {
-                throw new Error(json.error);
-            });
-        }
-        return response.json();
-    }).then(json => {
-        json.map((newContent, index) => {
-            nodeList[index].textContent = newContent;
-        })
-    }).catch(error => {
-        console.error('Debuzzing error:', error.message);
-    });
+    const chunkSize = 5;
 
+    for (let i = 0; i < nodeList.length; i += chunkSize) {
+        const chunk = nodeList.slice(i, i + chunkSize);
+        console.debug(`Debuzzing strings ${i}-${i + chunkSize - 1}...`)
+
+        fetch('http://localhost:7777/api/debuzz', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(chunk.map(node => node.textContent)),
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(json => {
+                    throw new Error(json.error);
+                });
+            }
+            return response.json();
+        }).then(json => {
+            json.map((newContent, index) => {
+                chunk[index].textContent = newContent;
+            })
+            console.debug(`Successfully debuzzed strings ${i}-${i + chunkSize - 1}!`)
+        }).catch(error => {
+            console.error('Debuzzing error:', error.message);
+        });
+    }
 }
 
 function extractTreeWalkerText() {
