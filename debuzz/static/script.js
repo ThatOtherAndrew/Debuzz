@@ -17,7 +17,7 @@ async function debuzz() {
     const text = textarea.value;
 
     try {
-        const response = await fetch('http://localhost:7777/api/debuzz', {
+        const response = await fetch('/api/debuzz', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
