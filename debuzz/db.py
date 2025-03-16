@@ -19,7 +19,7 @@ async def connect(logger: Logger):
 
     await cache.execute('''
         CREATE TABLE IF NOT EXISTS cache (
-            input TEXT,
+            input TEXT PRIMARY KEY,
             output TEXT,
             timestamp INTEGER DEFAULT (strftime('%s', 'now'))
         )
