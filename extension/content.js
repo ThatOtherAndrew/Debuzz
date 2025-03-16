@@ -77,10 +77,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         return true;
     }
-});
-
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "turnOn") {
         console.log("i'm tryong ok");
 
@@ -95,6 +91,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         return true;
     }
+    if (request.action === "ping") {
+        sendResponse({ status: "content_script_running" });
+    }
 });
 
 // -----------------------------------------------------------------------------
@@ -107,7 +106,7 @@ if (!window.audioInstance) {
 
 function getBuzzVolume() {
     chrome.storage.sync.get(["debuzzed"], (result) => {
-        if (result.debuzzed) {
+        if (result.debuzzed == true) {
             console.log("page debuzzed, no buzz :((((");
             return;
         }
@@ -150,7 +149,7 @@ function buzzAway(volume) {
 }
 
 function stopBuzzing() {
-    if (audioInstance) {
+    if (window.audioInstance) {
         console.log("stopping the buzz", window.audioInstance);
         window.audioInstance.pause();
         window.audioInstance.loop = false;

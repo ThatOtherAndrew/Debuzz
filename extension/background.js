@@ -14,40 +14,50 @@ updateBuzzScore();
 
 // -----------------------------------------------------------------------------
 
+
+// content script injection (avoids double injection which causes all sorts of shit)
+function ensureContentScript(tabId, callback) {
+    chrome.tabs.sendMessage(tabId, { action: "ping" }, (response) => {
+        if (chrome.runtime.lastError || !response) {
+            chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                files: ["content.js"]
+            }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error("Script injection failed:", chrome.runtime.lastError);
+                    return;
+                }
+                console.log("Script injected successfully");
+                callback();
+            });
+        } else {
+            callback();
+        }
+    });
+}
+
 // when the debuzz button is clicked in the popup, send a message to
 // the background script to debuzz the page
 document.getElementById('debuzz-button').addEventListener('click', () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (!tabs.length) return;
-
         const tabId = tabs[0].id;
 
-        // inject content script before sending message
-        chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            files: ["content.js"]
-        }, () => {
-            if (chrome.runtime.lastError) {
-                console.error("Script injection failed :", chrome.runtime.lastError);
-                return;
-            }
-            console.log("Script injected successfully");
-            // nooooow send the message after the script is injected
+        ensureContentScript(tabId, () => {
             chrome.tabs.sendMessage(tabId, { action: "debuzzAction" });
         });
     });
 });
 
-
+// when on-button clicke send a message to buzzzz
 document.getElementById('on-button').addEventListener('click', () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (!tabs.length) return;
-
         const tabId = tabs[0].id;
 
-        //  send the message after the script is injected
-        chrome.tabs.sendMessage(tabId, { action: "turnOn" });
-
+        ensureContentScript(tabId, () => {
+            chrome.tabs.sendMessage(tabId, { action: "turnOn" });
+        });
     });
 });
 
