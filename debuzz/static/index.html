@@ -6,17 +6,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.amber.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Press+Start+2P&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.amber.min.css">
+
   <title>Debuzz - The universal buzzword sanitiser</title>
 </head>
 
 <body>
-  <main class="container">
-    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-      <img src="https://placehold.co/64" alt="Debuzz logo" style="height: 10em">
-      <h1 style="font-size: 6em">Debuzz</h1>
+  <section class="section" id="top">
+    <div class="flex-container">
+      <div style="display: flex; align-items: center; gap: 1em;">
+        <img src="../../extension/assets/icon48.png" alt="Debuzz logo" id="logo" style="height: 8em;">
+        <div id="description">
+          <h1>Debuzz</h1>
+          <p>The universal buzzword sanitiser. Tired of text buzzing with too many buzzwords? Debuzz removes the
+            nonsense (and, potentially, your hearing and sanity) and leaves real meaning.</p>
+            <div id="ver-but-1">
+              <a href="https://chrome.google.com/webstore/detail/debuzz/extension-id" target="_blank">
+                <button class="btn" id="get-button">Get for Chrome</button></a>
+              <a href="#test-section"><button class="btn" id="down-arrow"> Test it out below ↓</button></a>
+            </div>
+        </div>
+      </div>
+
     </div>
-    <p>The universal buzzword sanitiser</p>
-  </main>
+  </section>
+
+  <section class="section" id="test-section">
+    <h2>Test It Out</h2>
+    <label for="buzzwordInput">Enter a phrase with buzzwords:</label>
+    <textarea id="buzzwordInput" placeholder="Something needlessly complicated..." rows="4"></textarea>
+    <div id="ver-but-2">
+      <button class="btn" onclick="debuzz()">Debuzz</button>
+      <a href="#top"><button class="btn" id="up-arrow">Back to the top ↑</button></a>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+
 </body>
 
 </html>

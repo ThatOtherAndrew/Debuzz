@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Debuzz",
-  "version": "1.0.0",
-  "description": "the ultimate tool to debuzz any web page !",
+  "version": "14.12.07",
+  "description": "Behold. The ultimate tool to debuzz any web page ! Note: after using this extension, you will either require hearing aids or a reassurance that you are indeed not skitsofrenic.",
   "host_permissions": [
     "<all_urls>"
   ],
