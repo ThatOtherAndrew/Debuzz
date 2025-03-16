@@ -16,7 +16,7 @@ async function debuzzText(originalText) {
         });
 
         if (!response.ok) {
-            throw new Error(`fUcIng HTTP error ! status : ${response.status}`);
+            throw new Error(`fUcIng HTTP error w status : ${response.status}`);
         }
 
         const data = await response.json();
@@ -58,6 +58,7 @@ async function debuzzPage() {
     }
 
     await Promise.all(promises);
+    chrome.storage.sync.set({ debuzzed: true });
     stopBuzzing();
     console.log("this page has been debuzzled");
 }
@@ -83,81 +84,84 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "turnOn") {
         console.log("i'm tryong ok");
 
+        chrome.storage.sync.set({ debuzzed: false });
+
+        chrome.storage.sync.get(["buzzVolume"], (result) => {
+            if (result.buzzVolume) {
+                buzzAway(result.buzzVolume);
+                console.log("Buzz volume found:", result.buzzVolume);
+            }
+        });
+
         return true;
     }
 });
 
-// this just sends the page content to the API
-// every time the page is loaded
-// function sendPageContent() {
-//     fetch(fetchAPI('debuzz'), {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ text: extractPageText() })
-//     })
-//         .then(response => response)
-//         .then(data => console.log("API response :", data))
-//         .catch(error => {
-//             console.error('Error :', error);
-//         });
-// }
-
-// sendPageContent();
-
 // -----------------------------------------------------------------------------
-//                         BUZZ AUDIO HANDLING
+//                            BUZZ AUDIO HANDLING
 // -----------------------------------------------------------------------------
 
-let audioInstance = null;
+if (!window.audioInstance) {
+    window.audioInstance = null;
+}
 
 function getBuzzVolume() {
-    fetch(fetchAPI('buzzvol'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: extractPageText() })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch buzz volume');
-            }
-            return response.json();
+    chrome.storage.sync.get(["debuzzed"], (result) => {
+        if (result.debuzzed) {
+            console.log("page debuzzed, no buzz :((((");
+            return;
+        }
+        fetch(fetchAPI('buzzvol'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: extractPageText() })
         })
-        .then(data => {
-            console.log("Get Buzz Volume response :", data);
-            chrome.storage.sync.set({ buzzScore: data.buzz_score });
-            chrome.storage.sync.set({ buzzVolume: data.buzz_volume });
-            buzzAway(data.buzz_volume);
-            return data;
-        })
-        .catch(error => {
-            console.error('error :', error);
-            throw error;
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch buzz volume');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Get Buzz Volume response :", data);
+                chrome.storage.sync.set({ buzzScore: data.buzz_score });
+                chrome.storage.sync.set({ buzzVolume: data.buzz_volume });
+                //buzzAway(data.buzz_volume);
+                return data;
+            })
+            .catch(error => {
+                console.error('error :', error);
+                throw error;
+            });
+
+    });
 }
 
 function buzzAway(volume) {
-    if (!audioInstance) {
-        const audio = new Audio(chrome.runtime.getURL('assets/buzz_sound.mp3'));
+    console.log(audioInstance);
+    if (!window.audioInstance) {
+        console.log("no audio instance, creating one");
+        window.audioInstance = new Audio(chrome.runtime.getURL('assets/buzz_sound.mp3'));
         console.log("buzzing away at volume :", volume);
-        audio.volume = volume; // depending on the page score
-        audio.loop = true;
-        audio.play().catch(error => console.error("got a error:", error));
+        window.audioInstance.volume = volume;
+        window.audioInstance.loop = true;
+        window.audioInstance.play().catch(error => console.error("got a error:", error));
     }
 }
 
 function stopBuzzing() {
     if (audioInstance) {
-        audioInstance.pause();
-        audioInstance.currentTime = 0;
-        audioInstance = null;
+        console.log("stopping the buzz", window.audioInstance);
+        window.audioInstance.pause();
+        window.audioInstance.loop = false;
+        window.audioInstance.muted = true;
+        window.audioInstance.volume = 0;
+        window.audioInstance.currentTime = 0;
+        window.audioInstance = null;
+        console.log(window.audioInstance);
     }
 }
 
-chrome.storage.sync.get(["buzzVolume"], (result) => {
-    if (result) {
-        console.log("buzzVolume :", result);
-        buzzAway(result);
-    }
-});
+
 
 getBuzzVolume();

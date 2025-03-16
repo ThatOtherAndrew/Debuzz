@@ -45,21 +45,17 @@ document.getElementById('on-button').addEventListener('click', () => {
 
         const tabId = tabs[0].id;
 
-        // inject content script before sending message
-        chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            files: ["content.js"]
-        }, () => {
-            if (chrome.runtime.lastError) {
-                console.error("Script injection failed :", chrome.runtime.lastError);
-                return;
-            }
-            console.log("Script injected successfully");
-            // nooooow send the message after the script is injected
-            chrome.tabs.sendMessage(tabId, { action: "turnOn" });
-        });
+        //  send the message after the script is injected
+        chrome.tabs.sendMessage(tabId, { action: "turnOn" });
+
     });
 });
+
+// chrome.runtime.onInstalled.addListener(() => {
+//     chrome.storage.sync.set({ debuzzed: false }, () => {
+//         console.log("debuzzed initialized to false");
+//     });
+// });
 
 // document.addEventListener("DOMContentLoaded", function () {
 //     const toggle = document.getElementById("soundToggle");

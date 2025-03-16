@@ -9,8 +9,7 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage",
-    "audiocapture"
+    "storage"
   ],
   "background": {
     "service_worker": "background.js"
