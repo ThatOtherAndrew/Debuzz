@@ -27,53 +27,16 @@ async function debuzzText(originalText) {
     }
 }
 
-async function debuzzPage() {
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        {
-            acceptNode: (node) =>
-                node.parentElement &&
-                    !["STYLE", "SCRIPT", "IFRAME", "NOSCRIPT"].includes(node.parentElement.tagName) &&
-                    node.textContent.trim()
-                    ? NodeFilter.FILTER_ACCEPT
-                    : NodeFilter.FILTER_REJECT,
-        },
-        false
-    );
-
-    let node;
-    const promises = [];
-
-    while ((node = walker.nextNode())) {
-        const currentNode = node; // save da node
-
-        const promise = debuzzText(node.textContent).then((newText) => {
-            if (currentNode.parentElement) { // node, you still in there ?
-                currentNode.textContent = newText;
-            }
-        }).catch(error => console.error("Error processing node:", error));
-
-        promises.push(promise);
-    }
-
-    await Promise.all(promises);
-    chrome.storage.sync.set({ debuzzed: true });
-    stopBuzzing();
-    console.log("this page has been debuzzled");
-}
-
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "debuzzAction") {
         console.log("debuzzing from content");
 
-        debuzzPage().then(() => {
-            sendResponse({ success: true });
-        }).catch(error => {
-            console.error("Error debuzzing page:", error);
-            sendResponse({ error: "Failed to debuzz the page" });
-        });
+        chrome.storage.sync.set({ debuzzed: true });
+        stopBuzzing();
+        console.log("this page has been debuzzled");
+
+        debuzzSubstitute();
+
 
         return true;
     }
@@ -162,6 +125,47 @@ function stopBuzzing() {
         window.audioInstance = null;
         console.log(window.audioInstance);
     }
+}
+
+function debuzzSubstitute() {
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    let node;
+    let nodeList = [];
+
+    while ((node = walker.nextNode())) {
+        if (
+            !node.parentElement
+            || node.parentElement.tagName === "STYLE"
+            || node.parentElement.tagName === "SCRIPT"
+            || !/[a-zA-Z]{2}/.test(node.textContent)
+        ) {
+            continue;
+        }
+        nodeList.push(node);
+    }
+
+    fetch('http://localhost:7777/api/debuzz', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nodeList.map(node => node.textContent)),
+    }).then(response => {
+        if (!response.ok) {
+            return response.json().then(json => {
+                throw new Error(json.error);
+            });
+        }
+        return response.json();
+    }).then(json => {
+        json.map((newContent, index) => {
+            nodeList[index].textContent = newContent;
+        })
+    }).catch(error => {
+        console.error('Debuzzing error:', error.message);
+    });
+
 }
 
 // getBuzzVolume();
