@@ -39,12 +39,14 @@
       }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/luxon.min.js"></script>
   <!--suppress JSUnresolvedReference -->
   <script defer>
       window.onload = async () => {
           document.querySelector('.loading-indicator').classList.add('show');
 
           let offset = 0
+
           while (true) {
               const response = await fetch(`http://localhost:7777/api/history?offset=${offset}`);
               const json = await response.json();
@@ -57,7 +59,7 @@
                   const row = document.getElementById('table-content').insertRow(-1);
                   row.insertCell(-1).innerText = element.input;
                   row.insertCell(-1).innerText = element.output;
-                  row.insertCell(-1).innerText = element.timestamp;
+                  row.insertCell(-1).innerText = luxon.DateTime.fromMillis(element.timestamp * 1000).toRelative();
                   requestAnimationFrame(() => {
                       row.classList.add('show');
                   })
