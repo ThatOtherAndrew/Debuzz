@@ -105,12 +105,15 @@ async def debuzz():
                 outputs[i] = row['output']
     cache_hits = len(outputs) - outputs.count(None)
     if cache_hits > 0:
-        quart.current_app.logger.debug(f'{cache_hits} cache hit{"" if cache_hits == 1 else "s"}')
+        quart.current_app.logger.debug(
+            f'{cache_hits} cache hit{"" if cache_hits == 1 else "s"}')
 
-    cache_misses = {i: inputs[i] for i in range(len(inputs)) if outputs[i] is None}
+    cache_misses = {i: inputs[i]
+                    for i in range(len(inputs)) if outputs[i] is None}
 
     if cache_misses:
-        quart.current_app.logger.debug(f'Debuzzing {len(cache_misses)} strings')
+        quart.current_app.logger.debug(
+            f'Debuzzing {len(cache_misses)} strings')
         response = await client.responses.create(
             model='gpt-4o-mini',
             temperature=0.2,
@@ -138,10 +141,12 @@ async def debuzz():
                 'action': 'debuzz',
             }
         )
-        response_strings = json.loads(response.output_text)['simplified_strings']
+        response_strings = json.loads(response.output_text)[
+            'simplified_strings']
         # strict=True asserts that the LLM returned the right number of responses
         print(cache_misses.keys(), response_strings, sep='\n')
-        remaining_outputs = dict(zip(cache_misses.keys(), response_strings, strict=True))
+        remaining_outputs = dict(
+            zip(cache_misses.keys(), response_strings, strict=True))
 
         for index, output in remaining_outputs.items():
             outputs[index] = output
@@ -177,9 +182,11 @@ async def get_buzz_volume():
     data = await quart.request.get_json()
     text = data.get('text', ' ')
 
+    clean_text = ' '.join(text.split())
+
     buzz_score = textstat.flesch_reading_ease(text)
     # the lower the reading ease the more pain it will cause
     # muahahahahhah
-    buzz_volume = max(0, min(1, (100 - buzz_score) / 100))
+    buzz_volume = 0 if buzz_score > 60 else max(0, min(1, 1 - (buzz_score / 60)))
 
     return {'buzz_volume': buzz_volume, 'buzz_score': buzz_score}

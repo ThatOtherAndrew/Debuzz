@@ -13,22 +13,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         debuzzSubstitute();
 
-
         return true;
     }
     if (request.action === "turnOn") {
         console.log("i'm tryong ok");
 
-        chrome.storage.sync.set({ debuzzed: false }, () => {
+        chrome.storage.sync.set({ debuzzed: false }, async () => {
             console.log("Reset debuzzed state");
-            getBuzzVolume();  // Recalculate buzz volume based on updated page text
-        });
+            await getBuzzVolume();
 
-        chrome.storage.sync.get(["buzzVolume"], (result) => {
-            if (result.buzzVolume) {
-                buzzAway(result.buzzVolume);
-                console.log("Buzz volume found:", result.buzzVolume);
-            }
+            chrome.storage.sync.get(["buzzVolume"], (result) => {
+                if (result.buzzVolume) {
+                    buzzAway(result.buzzVolume);
+                    console.log("Buzz volume found:", result.buzzVolume);
+                }
+            });
         });
 
         return true;
@@ -46,36 +45,39 @@ if (!window.audioInstance) {
     window.audioInstance = null;
 }
 
-function getBuzzVolume() {
-    chrome.storage.sync.get(["debuzzed"], (result) => {
-        if (result.debuzzed) {
-            console.log("page debuzzed, no buzz :((((");
-            return;
-        }
-        fetch(fetchAPI('buzzvol'), {
+async function getBuzzVolume() {
+    const result = await chrome.storage.sync.get(["debuzzed"]);
+
+    if (result.debuzzed) {
+        console.log("page debuzzed, no buzz :((((");
+        return;
+    }
+
+    const pageText = extractTreeWalkerText();
+
+    try {
+        const response = await fetch(fetchAPI('buzzvol'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: document.body.innerText })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch buzz volume');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Get Buzz Volume response :", data);
-                chrome.storage.sync.set({ buzzScore: data.buzz_score });
-                chrome.storage.sync.set({ buzzVolume: data.buzz_volume });
-                //buzzAway(data.buzz_volume);
-                return data;
-            })
-            .catch(error => {
-                console.error('error :', error);
-                throw error;
-            });
+            body: JSON.stringify({ text: pageText })
+        });
 
-    });
+        if (!response.ok) {
+            throw new Error('failed to fetch buzz volume, oh nooooo');
+        }
+
+        const data = await response.json();
+        console.log("Buzz Volume response :", data);
+
+        await chrome.storage.sync.set({
+            buzzScore: data.buzz_score,
+            buzzVolume: data.buzz_volume
+        });
+
+        return data;
+    } catch (error) {
+        console.error('eror fetching buzz volume :', error);
+    }
 }
 
 function buzzAway(volume) {
@@ -141,5 +143,31 @@ function debuzzSubstitute() {
     }).catch(error => {
         console.error('Debuzzing error:', error.message);
     });
+
+}
+
+function extractTreeWalkerText() {
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode: (node) =>
+                node.parentElement &&
+                !["STYLE", "SCRIPT", "IFRAME", "NOSCRIPT"].includes(node.parentElement.tagName) &&
+                node.textContent.trim()
+                    ? NodeFilter.FILTER_ACCEPT
+                    : NodeFilter.FILTER_REJECT,
+        },
+        false
+    );
+
+    const textNodes = [];
+    let node;
+
+    while ((node = walker.nextNode())) {
+        textNodes.push(node.textContent.trim());
+    }
+
+    return textNodes.join(" ");
 
 }
